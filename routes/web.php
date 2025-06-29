@@ -23,7 +23,7 @@ Route::get('/', function () {
 });
 Route::get('/debug', function () {
     $data=DB::table('view_konten_argenta_flat')->get();
-    // dd($data);
+    dd($data);
     return response()->json($data);
 });
 

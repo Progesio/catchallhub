@@ -1,6 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\DB;
+use function PHPUnit\Framework\returnArgument;
+//
 
 /*
 |--------------------------------------------------------------------------
@@ -14,7 +17,14 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    $data=DB::table('view_konten_argenta_flat')->get();
+    // dd($data);
+    return response()->json($data);
+});
+Route::get('/debug', function () {
+    $data=DB::table('view_konten_argenta_flat')->get();
+    // dd($data);
+    return response()->json($data);
 });
 
 

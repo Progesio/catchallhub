@@ -18,12 +18,22 @@ use function PHPUnit\Framework\returnArgument;
 
 Route::get('/', function () {
     $data=DB::table('view_konten_argenta_flat')->get();
-    // dd($data);
-    return response()->json($data);
+    // reformat data into json
+    foreach ($data as $k=> $item){
+        foreach ($item as $key => $value) {
+            $decoded = json_decode($value, true);
+            $item->$key = $decoded;
+        }
+        $data[$k]=$item;
+    }
+    return response()->json([
+        'data' => $data,
+        'message' => 'success',
+        'status' => 200
+    ]);
 });
 Route::get('/debug', function () {
     $data=DB::table('view_konten_argenta_flat')->get();
-    dd($data);
     return response()->json($data);
 });
 

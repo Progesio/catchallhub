@@ -18,7 +18,6 @@ use function PHPUnit\Framework\returnArgument;
 
 Route::get('/', function () {
     $data=DB::table('view_konten_argenta_flat')->get();
-    // reformat data into json
     foreach ($data as $k=> $item){
         foreach ($item as $key => $value) {
             $decoded = json_decode($value, true);
@@ -32,6 +31,7 @@ Route::get('/', function () {
         'status' => 200
     ]);
 });
+
 Route::get('/debug', function () {
     $data=DB::table('view_konten_argenta_flat')->get();
     return response()->json($data);

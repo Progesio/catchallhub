@@ -32,6 +32,26 @@ Route::get('/hub/argenta/index', function () {
     ]);
 });
 
+// call all berita
+Route::get('/hub/argenta/berita', function () {
+    $data = DB::table('argenta_beritas')->get();
+    return response()->json([
+        'data' => $data,
+        'message' => 'success',
+        'status' => 200
+    ]);
+});
+
+// call all karir
+Route::get('/hub/argenta/karir', function () {
+    $data = DB::table('argenta_karirs')->get();
+    return response()->json([
+        'data' => $data,
+        'message' => 'success',
+        'status' => 200
+    ]);
+});
+
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });

@@ -76,6 +76,45 @@ if (\Illuminate\Support\Str::startsWith(Auth::user()->avatar, 'http://') || \Ill
     <div class="row content-container">
         @include('voyager::dashboard.navbar')
         @include('voyager::dashboard.sidebar')
+
+        {{-- start --}}
+        <div class="card">
+            <div class="card-body text-center mt-5">
+                <h4 class="card-title">-</h4>
+                <h4 class="card-title">--</h4>
+                <h4 class="card-title">---</h4>
+                <button id="update-cache-btn" class="btn btn-primary">
+                    Update Cache
+                </button>
+                <div id="update-cache-result" style="margin-top:10px;"></div>
+            </div>
+        </div>
+        <script>
+            document.getElementById('update-cache-btn').onclick = function() {
+                var btn = this;
+                btn.disabled = true;
+                btn.innerText = 'Updating...';
+                fetch('/api/firebase/push/all', {
+                    method: 'POST',
+                    headers: { 'Accept': 'application/json' }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('update-cache-result').innerHTML =
+                        '<span class="badge badge-success">Success!</span>';
+                    btn.innerText = 'Update Cache';
+                    btn.disabled = false;
+                })
+                .catch(error => {
+                    document.getElementById('update-cache-result').innerHTML =
+                        '<span class="badge badge-danger">Failed!</span>';
+                    btn.innerText = 'Update Cache';
+                    btn.disabled = false;
+                });
+            };
+        </script>
+
+        {{-- end --}}
         <script>
             (function(){
                     var appContainer = document.querySelector('.app-container'),

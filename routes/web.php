@@ -15,29 +15,10 @@ use function PHPUnit\Framework\returnArgument;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-
-Route::get('/', function () {
-    $data=DB::table('view_konten_argenta_flat')->get();
-    foreach ($data as $k=> $item){
-        foreach ($item as $key => $value) {
-            $decoded = json_decode($value, true);
-            $item->$key = $decoded;
-        }
-        $data[$k]=$item;
-    }
-    return response()->json([
-        'data' => $data,
-        'message' => 'success',
-        'status' => 200
-    ]);
+Route::get('/',function(){
+    return redirect(('https://progesio.my.id'));
 });
 
-Route::get('/debug', function () {
-    $data=DB::table('view_konten_argenta_flat')->get();
-    return response()->json($data);
-});
-
-
-Route::group(['prefix' => 'admin'], function () {
+Route::group(['prefix' => 'admin', 'middleware' => ['voyager.firebase.trigger']], function () {
     Voyager::routes();
 });

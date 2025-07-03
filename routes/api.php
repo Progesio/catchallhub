@@ -23,6 +23,7 @@ Route::prefix('hub/argenta')->group(function () {
     Route::get('berita', [ArgentaController::class, 'getBeritaData']);
     Route::get('karir', [ArgentaController::class, 'getKarirData']);
     Route::get('mapubg', [ArgentaController::class, 'getMapData']);
+    Route::get('test-firebase', [ArgentaController::class, 'testFirebaseConnection']); // Test endpoint
 });
 
 // Branch Location Routes

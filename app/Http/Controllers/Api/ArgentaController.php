@@ -22,6 +22,15 @@ class ArgentaController extends Controller
         try {
             // Try to get data from Firebase first
             $firebaseResult = $this->firebaseService->getActiveData('argenta/index');
+
+            // Debug information
+            Log::info('Firebase result for index data:', [
+                'success' => $firebaseResult['success'] ?? false,
+                'has_data' => !empty($firebaseResult['data'] ?? null),
+                'data_count' => is_array($firebaseResult['data'] ?? null) ? count($firebaseResult['data']) : 0,
+                'message' => $firebaseResult['message'] ?? 'no message'
+            ]);
+
             if ($firebaseResult['success'] && !empty($firebaseResult['data'])) {
                 return response()->json([
                     'data' => $firebaseResult['data'],
@@ -191,5 +200,28 @@ class ArgentaController extends Controller
             'message' => 'Location data saved successfully',
             'data' => $validated
         ], 201);
+    }
+
+    public function testFirebaseConnection()
+    {
+        try {
+            // Test Firebase connection
+            $testResult = $this->firebaseService->getActiveData('test');
+
+            return response()->json([
+                'firebase_available' => $this->firebaseService !== null,
+                'test_result' => $testResult,
+                'config_check' => [
+                    'database_url' => config('firebase.database_url'),
+                    'credentials_file_exists' => file_exists(storage_path(config('firebase.credentials.file'))),
+                    'credentials_path' => storage_path(config('firebase.credentials.file'))
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage(),
+                'firebase_available' => false
+            ], 500);
+        }
     }
 }

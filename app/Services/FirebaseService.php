@@ -16,22 +16,69 @@ class FirebaseService
     public function __construct()
     {
         try {
-            $factory = (new Factory)
-                ->withDatabaseUri(config('firebase.database_url'));
+            $databaseUrl = config('firebase.database_url');
+            $credentialsPath = config('firebase.credentials.file');
 
-            // Jika menggunakan credentials file
-            if (config('firebase.credentials.file') && file_exists(storage_path(config('firebase.credentials.file')))) {
-                $factory = $factory->withServiceAccount(storage_path(config('firebase.credentials.file')));
+            if (empty($databaseUrl)) {
+                throw new Exception('Firebase database URL is not configured');
+            }
+
+            $factory = (new Factory)->withDatabaseUri($databaseUrl);
+
+            // Check if credentials file exists and is valid
+            if (!empty($credentialsPath)) {
+                $fullCredentialsPath = base_path($credentialsPath);
+
+                if (file_exists($fullCredentialsPath)) {
+                    $factory = $factory->withServiceAccount($fullCredentialsPath);
+                    Log::info('Firebase initialized with service account: ' . $fullCredentialsPath);
+                } else {
+                    Log::warning('Firebase credentials file not found: ' . $fullCredentialsPath);
+                    // Try to initialize without service account (might work in some cases)
+                }
+            } else {
+                Log::warning('Firebase credentials file path not configured');
             }
 
             $this->database = $factory->createDatabase();
             $this->storage = $factory->createStorage();
+
+            Log::info('Firebase services initialized successfully');
+
         } catch (Exception $e) {
-            Log::error('Firebase initialization error: ' . $e->getMessage());
+            Log::error('Firebase initialization error: ' . $e->getMessage(), [
+                'database_url' => config('firebase.database_url'),
+                'credentials_path' => config('firebase.credentials.file'),
+                'full_credentials_path' => base_path(config('firebase.credentials.file')),
+                'credentials_exists' => file_exists(base_path(config('firebase.credentials.file')))
+            ]);
             $this->database = null;
             $this->storage = null;
         }
-    }    public function pushData($path, $data)
+    }    public function isInitialized()
+    {
+        return $this->database !== null && $this->storage !== null;
+    }
+
+    public function getDiagnosticInfo()
+    {
+        return [
+            'database_initialized' => $this->database !== null,
+            'storage_initialized' => $this->storage !== null,
+            'database_url' => config('firebase.database_url'),
+            'credentials_path' => config('firebase.credentials.file'),
+            'full_credentials_path' => base_path(config('firebase.credentials.file')),
+            'credentials_exists' => file_exists(base_path(config('firebase.credentials.file'))),
+            'php_version' => PHP_VERSION,
+            'extensions' => [
+                'curl' => extension_loaded('curl'),
+                'json' => extension_loaded('json'),
+                'openssl' => extension_loaded('openssl')
+            ]
+        ];
+    }
+
+    public function pushData($path, $data)
     {
         try {
             if (!$this->database) {

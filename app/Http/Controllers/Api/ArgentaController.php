@@ -205,22 +205,24 @@ class ArgentaController extends Controller
     public function testFirebaseConnection()
     {
         try {
+            // Get diagnostic info
+            $diagnosticInfo = $this->firebaseService->getDiagnosticInfo();
+
             // Test Firebase connection
             $testResult = $this->firebaseService->getActiveData('test');
 
             return response()->json([
-                'firebase_available' => $this->firebaseService !== null,
+                'firebase_service_available' => $this->firebaseService !== null,
+                'firebase_initialized' => $this->firebaseService->isInitialized(),
                 'test_result' => $testResult,
-                'config_check' => [
-                    'database_url' => config('firebase.database_url'),
-                    'credentials_file_exists' => file_exists(storage_path(config('firebase.credentials.file'))),
-                    'credentials_path' => storage_path(config('firebase.credentials.file'))
-                ]
+                'diagnostic_info' => $diagnosticInfo
             ]);
         } catch (\Exception $e) {
+            $diagnosticInfo = $this->firebaseService->getDiagnosticInfo();
             return response()->json([
                 'error' => $e->getMessage(),
-                'firebase_available' => false
+                'firebase_available' => false,
+                'diagnostic_info' => $diagnosticInfo
             ], 500);
         }
     }
